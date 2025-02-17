@@ -1,0 +1,16 @@
+register - 05.30
+hash & try - 14.35
+Adding user - 17.00
+redirect user to his main page - 20.20
+quote - 24:15
+quoted - 30.35
+buy html- 34.00
+buy py- 35.25
+transaction table - 38:55
+calculate if user can buy - 40:40
+datetime 47.50
+index - 53.15
+sell - 1.11.20
+sell POST - 1.17.40
+history - 1.24.00
+Add more cash to account - 1.27.55

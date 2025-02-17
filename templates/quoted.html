@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Quoted
+{% endblock %}
+
+{% block main %}
+    <h1 class="text-danger">Stock Quote</h1>
+    {% if stock %}
+        <h2>A share of {{ stock.name }} ({{ stock.symbol }}) costs {{ stock.price | usd }}</h2>
+        <div>
+            <h3>Name: {{ stock.name }}</h3>
+            <h3>Price: {{ stock.price | usd }}</h3>
+            <h3>Symbol: {{ stock.symbol }}</h3>
+        </div>
+    {% else %}
+        <p>Stock information not available.</p>
+    {% endif %}
+{% endblock %}
