@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Quote
+{% endblock %}
+
+{% block main %}
+    <h1>Quote</h1>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class=flashes>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <h2>Popular Stocks</h2>
+    <table class="table table-striped">
+        <tbody>
+            {% for i in range(0, popular_stocks|length, 10) %} {# Iterate in chunks of 10 for 10 columns #}
+                <tr>
+                    {% for j in range(10) %} {# 10 columns per row #}
+                        {% if i + j < popular_stocks|length %} {# Check for out-of-bounds #}
+                            <td>
+                                <a href="#" onclick="document.getElementById('symbol').value = '{{ popular_stocks[i + j] }}'; return false;">
+                                    {{ popular_stocks[i + j] }}
+                                </a>
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <form action="/quote" method="post">
+        <div class="mb-3">
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="symbol" name="symbol" placeholder="Symbol" type="text">
+        </div>
+        <button class="btn btn-primary" type="submit">Quote</button>
+    </form>
+{% endblock %}
