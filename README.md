@@ -17,7 +17,7 @@ This web application allows users to manage their stock portfolios, buy and sell
     *   Windows: `.venv\Scripts\activate`
     *   macOS/Linux: `source .venv/bin/activate`
 5.  Install dependencies: `pip install -r requirements.txt`
-6.  Set up the database: (Add any specific database setup steps here)
+6.  Set up the database: (used SQLite)
 7.  Run the Flask application: `flask run`
 
 ## Usage Instructions
