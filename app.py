@@ -42,7 +42,66 @@ def index():
 @login_required
 def buy():
     """Buy shares of stock"""
-    return apology("TODO")
+    if request.method == "GET":
+        return render_template("buy.html")
+    
+    symbol = request.form.get("symbol")
+    shares = request.form.get("shares")
+
+    # Validate inputs
+    if not symbol or not shares:
+        return apology("Must provide both symbol & shares")
+    
+    # **Level 2: Shares Validation**
+    symbol = symbol.upper()
+    try:
+        shares = int(shares)
+    except ValueError:
+        return apology("Shares must be a valid integer")
+    if shares <= 0:
+        return apology("Shares must be a positive integer")
+
+    # **Level 3: Stock Symbol Validation**    
+    stock = lookup(symbol)
+    if stock is None:
+        return apology("Symbol not found!")
+    
+    # **Level 4: Calculate Transaction Value**
+    transaction_value = shares * stock["price"]
+    #transaction_value = round(shares * stock["price"], 2)
+    
+    # **Level 5: Check User's Cash Balance**
+    user_id = session["user_id"] #to get current user
+    user_cash_result = db.execute("SELECT cash from users WHERE id = ?", user_id)
+    if not user_cash_result or user_cash_result[0]["cash"] is None:
+        return apology("User cash not found!")
+
+    user_cash = user_cash_result[0]["cash"]
+
+    # Check if the user has enough cash
+    # if (current user cash) < transaction_value return apology
+    if user_cash < transaction_value:
+        return apology("Not enough Cash!")
+    
+    # **Level 6: Update new balance in Database**
+    # Update user's cash balance
+    new_balance = user_cash - transaction_value
+    
+    db.execute("UPDATE users SET cash = ? WHERE id = ?", new_balance, user_id)
+
+    return apology("Level 6 Completed!") #end of level
+    """
+    #Here we are Creating transactions table in finance.db
+    CREATE TABLE transactions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    symbol TEXT NOT NULL,
+    shares INTEGER NOT NULL,
+    price REAL NOT NULL,
+    transacted DATETIME NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+    """
 
 
 @app.route("/history")
