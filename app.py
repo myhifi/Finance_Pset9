@@ -6,6 +6,7 @@ from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from helpers import apology, login_required, lookup, usd
+import datetime
 
 # Configure application
 app = Flask(__name__)
@@ -67,12 +68,27 @@ def buy():
         return apology("Symbol not found!")
     
     # **Level 4: Calculate Transaction Value**
-    transaction_value = shares * stock["price"]
-    #transaction_value = round(shares * stock["price"], 2)
+    # transaction_value = shares * stock["price"]
+    transaction_value = round(shares * stock["price"], 2)
     
     # **Level 5: Check User's Cash Balance**
     user_id = session["user_id"] #to get current user
     user_cash_result = db.execute("SELECT cash from users WHERE id = ?", user_id)
+    #if you want to see what user_id returns then write:
+    # return jsonify(user_cash_result)
+    # outputs a list: [{"cash":10000}]
+    """
+    #Here we can Create transactions table in finance.db
+    CREATE TABLE transactions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    symbol TEXT NOT NULL,
+    shares INTEGER NOT NULL,
+    price REAL NOT NULL,
+    transacted DATETIME NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+    """
     if not user_cash_result or user_cash_result[0]["cash"] is None:
         return apology("User cash not found!")
 
@@ -89,19 +105,32 @@ def buy():
     
     db.execute("UPDATE users SET cash = ? WHERE id = ?", new_balance, user_id)
 
-    return apology("Level 6 Completed!") #end of level
+    #**Level 7: adding data into transactions db table
     """
-    #Here we are Creating transactions table in finance.db
-    CREATE TABLE transactions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    symbol TEXT NOT NULL,
-    shares INTEGER NOT NULL,
-    price REAL NOT NULL,
-    transacted DATETIME NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-    );
+    it's generally better to store timestamps in UTC.  This avoids timezone issues.  You can use:
+    datetime.datetime.utcnow()
     """
+    date = datetime.datetime.now()
+
+    db.execute('INSERT INTO transactions (user_id, symbol, shares, price, date) VALUES (?, ?, ?, ?, ?)', user_id, stock["symbol"], shares, stock["price"], date)
+    """Currently, the cash update and the transaction insertion are separate operations. If one fails, you could end up with inconsistent data (e.g., cash deducted but no transaction recorded).  Transactions ensure atomicity (all or nothing), consistency, isolation, and durability (ACID properties).  In SQLite, you can use conn.execute("BEGIN TRANSACTION") and conn.execute("COMMIT") (or conn.execute("ROLLBACK") if an error occurs).
+    # Database transaction
+    try:
+        db.execute("BEGIN TRANSACTION")  # Start transaction
+        # Deduct user cash
+        db.execute("UPDATE users SET cash = ? WHERE id = ?", (new_balance, user_id)) # Parameterized query
+        date = datetime.datetime.utcnow()  # UTC timestamp
+        # Record the transaction
+        db.execute("INSERT INTO transactions (user_id, symbol, shares, price, transacted) VALUES (?, ?, ?, ?, ?)", (user_id, stock["symbol"], shares, stock["price"], date)) # Parameterized query
+        db.execute("COMMIT")  # Commit transaction
+    except Exception as e:  # Catch database errors
+        db.execute("ROLLBACK")  # Rollback on error
+        print(f"Database error: {e}")  # Log the error (important!)
+        return apology("An error occurred during the transaction.")  # User-friendly message
+    """
+    flash("Bought successful!")
+
+    return redirect("/")
 
 
 @app.route("/history")
