@@ -121,7 +121,7 @@ def buy():
         db.execute("UPDATE users SET cash = ? WHERE id = ?", (new_balance, user_id)) # Parameterized query
         date = datetime.datetime.utcnow()  # UTC timestamp
         # Record the transaction
-        db.execute("INSERT INTO transactions (user_id, symbol, shares, price, transacted) VALUES (?, ?, ?, ?, ?)", (user_id, stock["symbol"], shares, stock["price"], date)) # Parameterized query
+        db.execute("INSERT INTO transactions (user_id, symbol, shares, price, transaction) VALUES (?, ?, ?, ?, ?)", (user_id, stock["symbol"], shares, stock["price"], date)) # Parameterized query
         db.execute("COMMIT")  # Commit transaction
     except Exception as e:  # Catch database errors
         db.execute("ROLLBACK")  # Rollback on error
