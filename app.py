@@ -251,7 +251,7 @@ def quote():
       flash("Invalid symbol or could not retrieve quote.")
       return render_template("quote.html", popular_stocks=POPULAR_STOCKS)
 
-    name = stock("name")
+    name = stock.get("name")
     price = stock["price"]
     symbol = stock["symbol"].upper()
 
