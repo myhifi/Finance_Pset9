@@ -36,7 +36,28 @@ def after_request(response):
 @login_required
 def index():
     """Show portfolio of stocks"""
-    return apology("TODO")
+    # **Level 1: Basic Data Retrieval and Display**
+    user_id = session["user_id"]
+    user_cash = db.execute("SELECT cash FROM users WHERE id = ?", (user_id,)) #Anti-injection, tuple!
+    if user_cash:  # Check if the list is NOT empty
+        cash_value = user_cash[0]["cash"] # Extract value only if list is not empty
+    else:
+        return apology("User not found", 404) # Or handle the error
+    return render_template("index.html", user_id= user_id, cash=usd(cash_value)) # Use the extracted variable
+"""displays an HTML table summarizing, for:
+the user currently logged in,
+which stocks the user owns,
+the numbers of shares owned,
+the current price of each stock,
+and the total value of each holding (i.e., shares times price).
+*Also display:
+the user’s current cash balance
+along with a grand total (i.e., stocks’ total value plus cash).
+
+Odds are you’ll want to execute multiple SELECTs. Depending on how you implement your table(s), you might find GROUP BY HAVING SUM and/or WHERE of interest.
+Odds are you’ll want to call lookup for each stock.
+
+"""
 
 
 @app.route("/buy", methods=["GET", "POST"])
