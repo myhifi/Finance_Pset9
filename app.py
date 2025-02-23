@@ -221,15 +221,15 @@ def quote():
       flash("Must provide symbol")  # Use flash instead of apology
       return render_template("quote.html", popular_stocks=POPULAR_STOCKS)
 
-    quote_data = lookup(symbol)  # Call lookup function
+    stock = lookup(symbol)  # Call lookup function
 
-    if not quote_data:
+    if not stock:
       flash("Invalid symbol or could not retrieve quote.")
       return render_template("quote.html", popular_stocks=POPULAR_STOCKS)
 
-    name = quote_data.get("name")  # Assuming name is also retrieved by lookup
-    price = quote_data["price"]
-    symbol = quote_data["symbol"].upper()
+    name = stock("name")
+    price = stock["price"]
+    symbol = stock["symbol"].upper()
 
     return render_template("quoted.html", name=name, price=price, symbol=symbol)
 
