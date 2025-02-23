@@ -36,6 +36,9 @@ def after_request(response):
 @login_required
 def index():
     """Show portfolio of stocks"""
+    if request.method == "GET":
+        return render_template("index.html")
+        
     # **Level 1: Basic Data Retrieval and Display**
     user_id = session["user_id"]
     user_cash = db.execute("SELECT cash FROM users WHERE id = ?", (user_id,)) #Anti-injection, tuple!
