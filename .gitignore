@@ -6,3 +6,4 @@ venv/              # Another common name for virtual environments
 .idea/             # Ignore JetBrains IDE configuration files
 *.env              # Ignore environment files containing sensitive data (never commit these!)
 my_secret_file.txt # Ignore specific files that you don't want to commit
+flask_session/     # Ignore the entire flask_session directory
