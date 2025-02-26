@@ -1,11 +1,11 @@
 import os
-
+import csv
 from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, login_required, lookup, usd
+from helpers import apology, login_required, usd
 import datetime
 
 # Configure application
@@ -22,6 +22,34 @@ Session(app)
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///finance.db")
 
+# Path to your CSV file
+CSV_FILE = "listing_status.csv"
+
+def lookup(symbol):
+    """Look up quote for symbol."""
+
+    try:
+        with open(CSV_FILE, 'r', encoding='utf-8') as file:  # Handle potential encoding issues
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row["symbol"].upper() == symbol.upper():  # Case-insensitive comparison
+                    try:  # Attempt to convert price to float
+                        price = float(row["price"])
+                        return {
+                            "symbol": row["symbol"],
+                            "name": row["name"],
+                            "price": price
+                        }
+                    except ValueError:
+                        return None # Price is not a valid float
+
+            return None  # Symbol not found
+    except FileNotFoundError:
+        print(f"Error: CSV file '{CSV_FILE}' not found.")  # Print for debugging
+        return None
+    except Exception as e: # Catch other potential errors
+        print(f"An error occurred: {e}")
+        return None
 
 @app.after_request
 def after_request(response):
