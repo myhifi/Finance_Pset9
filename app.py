@@ -137,7 +137,7 @@ def buy():
     symbol TEXT NOT NULL,
     shares INTEGER NOT NULL,
     price REAL NOT NULL,
-    transaction DATETIME NOT NULL,
+    date DATETIME NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
     );
     """
