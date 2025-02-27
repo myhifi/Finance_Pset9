@@ -59,15 +59,6 @@ def after_request(response):
     response.headers["Pragma"] = "no-cache"
     return response
 
-@app.after_request
-def after_request(response):
-    """Ensure responses aren't cached"""
-    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    response.headers["Expires"] = 0
-    response.headers["Pragma"] = "no-cache"
-    return response
-
-
 @app.route("/")
 @login_required
 def index():
@@ -121,7 +112,7 @@ def buy():
     symbol TEXT NOT NULL,
     shares INTEGER NOT NULL,
     price REAL NOT NULL,
-    transaction DATETIME NOT NULL,
+    date DATETIME NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
     );
     """
