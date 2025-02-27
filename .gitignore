@@ -1,4 +1,4 @@
-__pycache__/       # Ignore the __pycache__ directory
+__pycache__/       # Ignore the __pycache__ directory; rmdir /s /q __pycache__
 *.pyc              # Ignore compiled Python bytecode files (.pyc)
 .venv/             # Ignore your virtual environment directory (or venv/, env/, etc. - adjust to your naming)
 venv/              # Another common name for virtual environments
@@ -6,4 +6,4 @@ venv/              # Another common name for virtual environments
 .idea/             # Ignore JetBrains IDE configuration files
 *.env              # Ignore environment files containing sensitive data (never commit these!)
 my_secret_file.txt # Ignore specific files that you don't want to commit
-flask_session/     # Ignore the entire flask_session directory
+flask_session/     # Ignore the entire flask_session directory; rmdir /s /q flask_session
