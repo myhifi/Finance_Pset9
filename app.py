@@ -64,15 +64,20 @@ def after_request(response):
 @login_required
 def index():
     """Show portfolio of stocks"""
-        
+    
     # **Level 1: Basic Data Retrieval and Display**
     user_id = session["user_id"]
-    user_cash = db.execute("SELECT cash FROM users WHERE id = ?", (user_id,)) #Anti-injection, tuple!
-    if user_cash:  # Check if the list is NOT empty
-        cash_value = user_cash[0]["cash"] # Extract value only if list is not empty
+    
+    # Retrieve username and cash in a single query
+    user_data = db.execute("SELECT username, cash FROM users WHERE id = ?", (user_id,)) 
+
+    if user_data:  # Ensure the query returned results
+        username = user_data[0]["username"]  # Extract username
+        cash_value = user_data[0]["cash"]  # Extract cash
     else:
-        return apology("User not found", 404) # Or handle the error
-    return render_template("index.html", user_id= user_id, cash=usd(cash_value)) # Use the extracted variable
+        return apology("User not found", 404)  # Handle missing user case
+
+    return render_template("index.html", username=username, cash=usd(cash_value))
 """displays an HTML table summarizing, for:
 the user currently logged in,
 which stocks the user owns,
