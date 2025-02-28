@@ -69,7 +69,7 @@ def index():
     user_id = session["user_id"]
     
     # Retrieve username and cash in a single query
-    user_data = db.execute("SELECT username, cash FROM users WHERE id = ?", (user_id,)) 
+    user_data = db.execute("SELECT username, cash FROM users WHERE id = ?", (user_id,))
 
     if user_data:  # Ensure the query returned results
         username = user_data[0]["username"]  # Extract username
@@ -77,7 +77,16 @@ def index():
     else:
         return apology("User not found", 404)  # Handle missing user case
 
-    return render_template("index.html", username=username, cash=usd(cash_value))
+    # Retrieve owned stocks
+    owned_stocks = db.execute(
+        "SELECT symbol, SUM(shares) as shares FROM transactions WHERE user_id = ? GROUP BY symbol HAVING SUM(shares) > 0",
+        (user_id,)
+    )
+
+    return render_template(
+        "index.html", username=username, cash=usd(cash_value), owned_stocks=owned_stocks
+    )
+
 """displays an HTML table summarizing, for:
 the user currently logged in,
 which stocks the user owns,
