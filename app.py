@@ -64,29 +64,35 @@ def after_request(response):
 @login_required
 def index():
     """Show portfolio of stocks"""
-    
-    # **Level 1: Basic Data Retrieval and Display**
+        
+    # **1: Basic Data Retrieval and Display**
     user_id = session["user_id"]
-    
-    # Retrieve username and cash in a single query
-    user_data = db.execute("SELECT username, cash FROM users WHERE id = ?", (user_id,))
-
+    # Retrieve username and cash
+    user_data = db.execute("SELECT username, cash FROM users WHERE id = ?", (user_id,)) #Anti-injection, tuple!
     if user_data:  # Ensure the query returned results
         username = user_data[0]["username"]  # Extract username
         cash_value = user_data[0]["cash"]  # Extract cash
     else:
-        return apology("User not found", 404)  # Handle missing user case
-
-    # Retrieve owned stocks
+        return apology("User not found", 404)
+    
+    # **2: Stock Data Retrieval and Display**
     owned_stocks = db.execute(
-        "SELECT symbol, SUM(shares) as shares FROM transactions WHERE user_id = ? GROUP BY symbol HAVING SUM(shares) > 0",
+        "SELECT symbol, SUM(shares) AS shares, price FROM transactions WHERE user_id = ? GROUP BY symbol HAVING SUM(shares) > 0",
         (user_id,)
     )
 
-    return render_template(
-        "index.html", username=username, cash=usd(cash_value), owned_stocks=owned_stocks
-    )
+    # Calculate final total
+    total_value = 0
+    for stock in owned_stocks:
+        if isinstance(stock["price"], (int, float)): #check if price is a number
+            total_value += stock["price"] * stock["shares"]
+    total_value += cash_value #add the cash value
 
+    return render_template(
+        "index.html",
+        username=username, cash=usd(cash_value), owned_stocks=owned_stocks,
+        total_value=usd(total_value)
+    ) # Use the extracted variable
 """displays an HTML table summarizing, for:
 the user currently logged in,
 which stocks the user owns,
@@ -94,11 +100,11 @@ the numbers of shares owned,
 the current price of each stock,
 and the total value of each holding (i.e., shares times price).
 *Also display:
-the user’s current cash balance
-along with a grand total (i.e., stocks’ total value plus cash).
+the user's current cash balance
+along with a grand total (i.e., stocks' total value plus cash).
 
-Odds are you’ll want to execute multiple SELECTs. Depending on how you implement your table(s), you might find GROUP BY HAVING SUM and/or WHERE of interest.
-Odds are you’ll want to call lookup for each stock.
+Odds are you'll want to execute multiple SELECTs. Depending on how you implement your table(s), you might find GROUP BY HAVING SUM and/or WHERE of interest.
+Odds are you'll want to call lookup for each stock.
 
 """
 
