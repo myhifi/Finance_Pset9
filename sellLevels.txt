@@ -1,0 +1,135 @@
+Gemini: Absolutely! Here's a breakdown of the implementation of the `/sell` route, broken down into level steps:
+
+**Level 1: Basic Structure and Input Handling (HTML and Route Setup)**
+
+1.  **HTML (`sell.html`):**
+    * Create a new HTML template named `sell.html`.
+    * Add a form with a `POST` method that submits to `/sell`.
+    * Include a `select` element for the stock symbol (`name="symbol"`). Populate this select menu with the user's owned stock symbols.
+    * Add a text input field for the number of shares (`name="shares"`).
+    * Add a submit button.
+
+2.  **Route Setup (`app.py`):**
+    * Create a new route `/sell` that handles both `GET` and `POST` requests.
+    * For `GET` requests, retrieve the user's owned stock symbols from the database and render the `sell.html` template, passing the symbols.
+    * For `POST` requests, get the symbol and shares data from the form.
+
+
+**Level 2: Input Validation and Stock Ownership Checks**
+
+1.  **Validation (`app.py` - `POST`):**
+    * Check if the symbol is selected. If not, return an apology.
+    * Check if the shares input is a positive integer. If not, return an apology.
+    * Check if the user owns the selected stock.
+    * Check if the user owns enough shares of that stock.
+
+
+**Level 3: Selling Logic and Database Updates**
+
+1.  **Selling Logic (`app.py` - `POST`):**
+    * Retrieve the current price of the stock using the `lookup()` function (from your `helpers.py`).
+    * Calculate the total sale value.
+    * Update the user's cash in the `users` table.
+    * Insert a new transaction record into the `transactions` table with a negative `shares` value (representing a sale).
+    * Redirect the user to the home page.
+
+
+**Important Notes:**
+
+* Make sure you have the `lookup()` function defined in your `helpers.py` file to get stock prices.
+* Ensure your database schema includes the necessary tables (`users` and `transactions`).
+* Add the transaction_type column to your database to record the difference between buy and sell transactions.
+* Add the usd filter to your app.py file, if you have not already.
+* Test each level thoroughly before moving on to the next.
+* Add bootstrap styling to the sell.html page.
+
+*** Solution (in order):
+
+```html
+    {% extends "layout.html" %}
+    {% block title %}
+        Sell
+    {% endblock %}
+
+    {% block main %}
+        <form action="/sell" method="post">
+            <div class="form-group">
+                <select class="form-control" name="symbol">
+                    <option disabled selected>Symbol</option>
+                    {% for stock in owned_stocks %}
+                        <option value="{{ stock.symbol }}">{{ stock.symbol }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <input autocomplete="off" autofocus class="form-control" name="shares" placeholder="Shares" type="number">
+            </div>
+            <button class="btn btn-primary" type="submit">Sell</button>
+        </form>
+    {% endblock %}
+    ```
+```python
+    @app.route("/sell", methods=["GET", "POST"])
+    @login_required
+    def sell():
+        """Sell shares of stock"""
+        user_id = session["user_id"]
+
+        if request.method == "GET":
+            owned_stocks = db.execute("SELECT symbol FROM transactions WHERE user_id = ? GROUP BY symbol HAVING SUM(shares) > 0", (user_id,))
+            return render_template("sell.html", owned_stocks=owned_stocks)
+
+        else:
+            symbol = request.form.get("symbol")
+            shares = request.form.get("shares")
+
+            # Level 2 and 3 will add validation and the rest of the post logic.
+            return redirect("/") #temporary redirect
+    ```
+```python
+    @app.route("/sell", methods=["GET", "POST"])
+    @login_required
+    def sell():
+        # ... (GET request handling) ...
+
+        else:
+            symbol = request.form.get("symbol")
+            shares = request.form.get("shares")
+
+            if not symbol:
+                return apology("Must select symbol")
+
+            if not shares or not shares.isdigit() or int(shares) <= 0:
+                return apology("Shares must be a positive integer")
+
+            shares = int(shares)
+
+            owned_shares = db.execute("SELECT SUM(shares) as total_shares FROM transactions WHERE user_id = ? AND symbol = ?", (user_id, symbol))
+
+            if not owned_shares or owned_shares[0]["total_shares"] is None or owned_shares[0]["total_shares"] < shares:
+                return apology("Insufficient shares")
+
+            # Level 3 will implement the actual selling logic.
+            return redirect("/")
+    ```
+```python
+    @app.route("/sell", methods=["GET", "POST"])
+    @login_required
+    def sell():
+        # ... (GET and validation logic) ...
+
+        else:
+            # ... (validation) ...
+
+            stock_info = lookup(symbol)
+            if stock_info is None:
+                return apology("Invalid stock symbol")
+
+            price = stock_info["price"]
+            sale_value = price * shares
+
+            db.execute("UPDATE users SET cash = cash + ? WHERE id = ?", (sale_value, user_id))
+            db.execute("INSERT INTO transactions (user_id, symbol, shares, price, transaction_type) VALUES (?, ?, ?, ?, ?)", (user_id, symbol, -shares, price, "SELL"))
+
+            return redirect("/")
+    ```
