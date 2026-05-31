@@ -40,7 +40,7 @@ Frontend UI: Jinja2 Template Engine, HTML5, CSS3, and Bootstrap 5
 📂 Project Architecture
 Based on the packed file system in Finance New.txt, the workspace layout is structured as follows:  
 
-    ```Plaintext
+    ```
     ├── app.py             # Main routing controller, API endpoints, and core execution logic
     ├── helpers.py         # Middleware tools (login requirements, USD formatting, custom apologies)
     ├── finance.db         # Core relational SQLite database (users, transactions, watchlist)
