@@ -40,19 +40,19 @@ Frontend UI: Jinja2 Template Engine, HTML5, CSS3, and Bootstrap 5
 📂 Project Architecture
 Based on the packed file system in Finance New.txt, the workspace layout is structured as follows:  
 
-```Plaintext
-├── app.py             # Main routing controller, API endpoints, and core execution logic
-├── helpers.py         # Middleware tools (login requirements, USD formatting, custom apologies)
-├── finance.db         # Core relational SQLite database (users, transactions, watchlist)
-├── requirements.txt   # Declared environmental package dependencies
-├── static/            # Static UI asserts (custom styling stylesheets and design icons)
-│   ├── favicon.ico
-│   └── styles.css
-└── templates/         # Modular Jinja2 web interface templates
-    ├── layout.html    # Core global navigation layout structure
-    ├── index.html     # Active trading dashboard interface
-    ├── watchlist.html # Watchlist management portal
-    └── [..other interface elements..]
+    ```Plaintext
+    ├── app.py             # Main routing controller, API endpoints, and core execution logic
+    ├── helpers.py         # Middleware tools (login requirements, USD formatting, custom apologies)
+    ├── finance.db         # Core relational SQLite database (users, transactions, watchlist)
+    ├── requirements.txt   # Declared environmental package dependencies
+    ├── static/            # Static UI asserts (custom styling stylesheets and design icons)
+    │   ├── favicon.ico
+    │   └── styles.css
+    └── templates/         # Modular Jinja2 web interface templates
+        ├── layout.html    # Core global navigation layout structure
+        ├── index.html     # Active trading dashboard interface
+        ├── watchlist.html # Watchlist management portal
+        └── [..other interface elements..]
 
 💾 Database Schema
 The persistent engine utilizes three primary relational tables within finance.db to link financial datasets together:  
