@@ -40,7 +40,7 @@ Frontend UI: Jinja2 Template Engine, HTML5, CSS3, and Bootstrap 5
 📂 Project Architecture
 Based on the packed file system in Finance New.txt, the workspace layout is structured as follows:  
 
-Plaintext
+```Plaintext
 ├── app.py             # Main routing controller, API endpoints, and core execution logic
 ├── helpers.py         # Middleware tools (login requirements, USD formatting, custom apologies)
 ├── finance.db         # Core relational SQLite database (users, transactions, watchlist)
@@ -53,6 +53,7 @@ Plaintext
     ├── index.html     # Active trading dashboard interface
     ├── watchlist.html # Watchlist management portal
     └── [..other interface elements..]
+
 💾 Database Schema
 The persistent engine utilizes three primary relational tables within finance.db to link financial datasets together:  
 
@@ -81,5 +82,5 @@ pip install -r requirements.txt
 
 4.  **Launch the Web Server:**
     ```bash
-flask run
+    flask run
 Open your web browser and navigate to `[http://127.0.0.1:5000/](http://127.0.0.1:5000/)` to test your platform.
