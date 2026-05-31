@@ -1,3 +1,4 @@
+![Project Preview](Preview.png)
 C$50 Finance 📈
 A robust, full-stack web application designed to simulate a stock trading platform. Users can register for an account, check real-time stock quotes, simulate buying and selling stocks with mock currency, track their active portfolios, and monitor stock price thresholds using a custom algorithmic watchlist.
 
