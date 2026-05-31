@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Index
+{% endblock %}
+
+{% block main %}
+    <h1 class="text-center">{{username}} Portfolio</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Symbol</th>
+                <th>Name</th>
+                <th>Shares</th>
+                <th>Price</th>
+                <th>Total</th>
+                <th>Buy</th>
+                <th>Sell</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stock in stocks %}
+                <tr>
+                    <td>{{ stock.symbol }}</td>
+                    <td>{{ stock.name }}</td>
+                    <td>{{ stock.shares }}</td>
+                    <td>{{ stock.price | usd }}</td>
+                    <td>{{ (stock.shares * stock.price) | usd }}</td>
+                    <td>
+                        <form action="/buy" method="post">
+                            <input name="symbol" type="hidden" value="{{ stock.symbol }}">
+                            <input autocomplete="off" name="shares" placeholder="Shares to buy" type="number" min="1" required>
+                            
+                            <button class="btn btn-primary" type="submit">Buy</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form action="/sell" method="post">
+                            <input type="hidden" name="symbol" value="{{ stock.symbol }}">
+                            <input autocomplete="off" name="shares" placeholder="Shares to sell" type="number" min="1" required>
+                            <button class="btn btn-primary" type="submit">Sell</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="4">Total Value</th>
+                <td>{{ total_value | usd }}</td>
+            </tr>
+            <tr>
+                <th colspan="4">Cash</th>
+                <td>{{ cash | usd }}</td>
+            </tr>
+            <tr>
+                <th colspan="4">Total Portfolio Value</th>
+                <td>{{ grand_total | usd }}</td>
+        </tfoot>
+    </table>
+{% endblock %}
